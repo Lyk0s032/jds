@@ -7,11 +7,32 @@ const modelPayroll = require('./model/nomina');
 const modelInventary = require('./model/inventary');
 const modelProduct = require('./model/productInventary');  
 const modelStock = require('./model/productDetails');
+const modelCar = require('./model/car');
+// Para vender
+const modelCategory = require('./model/categoryToSell');
+const modelItem = require('./model/items');
+// Relación para productos a vender y producto en inventario
+const modelReceta = require('./model/receta');
+// QR 
+const modelQR = require('./model/QR');
+// PRODUCTOS Y QR
+const modelChosee = require('./model/chosee');
 
-const sequelize = new Sequelize('postgres:postgres:123@localhost:5432/jds', {
+// ------- GASTOS -----------------
+// Servicios
+const modelService = require('./model/service');
+const modelPayService = require('./model/ServicePay');
+
+// SELLS 
+const modelSell = require('./model/sell');
+const modelProductSell = require('./model/sellProducts');
+require('dotenv').config(); `postgres:postgres:123@localhost:5432/jds`
+
+const sequelize = new Sequelize(`postgresql://postgres:baEA8SXlNLXhUuD8t6MC@containers-us-west-38.railway.app:7399/railway`, {
     logging: false,
     native: false,
 });
+
 
 // Modelos
 modelBusiness(sequelize);   // Business
@@ -22,8 +43,26 @@ modelPayroll(sequelize);    // Nomina
 modelInventary(sequelize);  // Cajas de inventario (Inventario) 
 modelProduct(sequelize);    // Productos del inventario
 modelStock(sequelize);      // Existencias en inventario
+//  MODELOS PARA VENDER
+modelCategory(sequelize);   //  Categorías de menu
+modelItem(sequelize);       //  Items categoría
+//  MODELO DE RECETA
+modelReceta(sequelize);
+// MODELO QR Y MESA
+modelQR(sequelize);
+// MODEL CAR PARA MESAS
+modelCar(sequelize);
+// MODEL QR PRODUCTS
+modelChosee(sequelize);
 
-const { business, person, salary, movement, payroll, inventary, product, stock} = sequelize.models;
+// MODEL SERVICES 
+modelService(sequelize);
+modelPayService(sequelize);
+
+// SELL
+modelSell(sequelize);
+modelProductSell(sequelize);
+const { business, person, salary, movement, payroll, inventary, product, stock, category, item, receta, QR, car, chosee, service, PayService, sell, ProductSell} = sequelize.models;
 
 business.hasMany(person, {as: "trabajadores", foreignKey:"businessId"});
 person.belongsTo(business, {as: "business"});
@@ -53,6 +92,56 @@ product.belongsTo(inventary, {as: "caja"});
 product.hasMany(stock, { as: "registros", foreignKey:"stockId" });
 stock.belongsTo(product, { as: "producto" }); 
 
+
+// Relación Business y detalles de productos (Stock);
+business.hasMany(stock, { as: "stocks" });
+stock.belongsTo(business, { as: "business" });  
+
+// Relacion de business y las categorías para productos
+business.hasMany(category, {as: "categorias"});
+category.belongsTo(business, {as: "negocio"});
+
+// Relacion de la carta con el productos - items
+category.hasMany(item, {as: "productos"});
+item.belongsTo(category, {as: "carta"});
+
+// Asociación de productos a vender y productos en el inventario:
+item.belongsToMany(product, { through: 'receta' }); 
+product.belongsToMany(item, { through: 'receta' });
+
+// Relacion business - QR y sus mesas
+business.hasMany(QR, {as: "mesas"}); // Mesas : Códigos QR disponibles.
+QR.belongsTo(business, {as: "business"}); 
+
+
+// Relación MESA - CAR
+QR.hasMany(car, {as: "car"}); // QR ES MESA
+car.belongsTo(QR, {as: "mesa"}); // CARRITO
+
+business.hasMany(car, {as: "ventas"}); // QR Y LAS VENTAS
+car.belongsTo(business, {as: 'business'}); // LAS VENTAS TIENE EL CAR
+
+
+// Asociación de productos a vender y productos en el inventario:
+car.belongsToMany(item, { through: 'chosee' }); 
+item.belongsToMany(car, { through: 'chosee' });
+
+// asosicación de los servicios y el business
+business.hasMany(service, {as: "servicios"});
+service.belongsTo(business, {as: "business"});
+
+
+// asosicación de los pagos a los servicios
+service.hasMany(PayService, {as: "pagos"});
+PayService.belongsTo(service, {as: "service"});
+
+// Relacionado con las ventas registradas directament.
+business.hasMany(sell, {as: 'sell'});
+sell.belongsTo(business, {as: 'business'});
+
+// Relacionando las sell con los item
+sell.belongsToMany(item, { through: 'ProductSell' }); 
+item.belongsToMany(sell, { through: 'ProductSell' });
 module.exports = {
     ...sequelize.models,
     db: sequelize,

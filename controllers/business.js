@@ -14,21 +14,15 @@ module.exports = {
             const { code } = req.params;
 
             if(!code) return res.send('No reconocemos este enlace');
-            
-            const searchBusiness = await business.findAll({
-                where: {
-                    LegalNumber: code
-                }
-            }); 
-            if(!searchBusiness.length) return res.send('No existe este negocio');
 
-            const buss = await business.findByPk(searchBusiness[0].id, {
+            const buss = await business.findByPk(code, {
                 include: [{
                     model: person,
                     as: "trabajadores"
                 }]
             })
-            res.json({buss}); 
+            if(!buss) return res.status(404).json({msg: 'No existe'});
+            res.json(buss); 
         }catch(err){ 
             res.json(err);
         }
@@ -60,6 +54,31 @@ module.exports = {
 
         }catch(err){ 
             console.log(err);
+        }
+    },
+
+
+    async updateBusiness(req, res){
+        try{
+            const { profileLogo, description, direccion, time, businessId} = req.body;
+            if(!profileLogo || !description || !direccion || !time || !businessId) return res.status(501).json({msg: 'No pudes dejar campos vacios'})
+            const updateBusiness = await business.update({
+                profileLogo,
+                description,
+                time,
+                direccion,
+            }, {
+                where: {
+                    id: businessId
+                }
+            })
+            .catch(err => res.status(500).json(err));
+            
+            res.status(200).json(updateBusiness);
+
+        }catch(err){
+            console.log(err);
+            res.status(500).json(err);
         }
     }
 } 
