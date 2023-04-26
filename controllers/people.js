@@ -4,10 +4,10 @@ const { business, person, salary, movement } = require('../db');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const authConfig = require('../config/Auth');
-
+// Pequeña revisión
 module.exports = {
     async getPeople(req, res){ 
-        res.send('Funciona asas');
+        res.send('Funciona asas'); 
     },
 
     async getPeopleById(req, res){
