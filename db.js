@@ -30,7 +30,6 @@ const modelProductSell = require('./model/sellProducts');
 
 const sequelize = new Sequelize(`postgresql://postgres:DZn7RIWDMDrzRyHpHKcq@containers-us-west-163.railway.app:7240/railway`, {
     logging: false,
-    native: false,
 });
 
 
