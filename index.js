@@ -19,7 +19,7 @@ const { getRecetaByItem, getItemByCar } = require('./controllers/receta');
 const { getServicesOfBusiness, createServiceForBusiness, addPayToServices, getPayToServicesByMonth, getServiceById } = require('./controllers/service');
 const { getSellsByBusiness, createSellByBusinessId, addProductToSell, updateCarToFinish, getSellsByMonth } = require('./controllers/sell');
 
-
+const PORT = process.env.PORT || 3001; 
 const app = express();
 app.use(express.json()); 
 
@@ -148,9 +148,9 @@ app.get('/sell/business/:businessId/:date', getSellsByMonth);
 app.post('/sell/post/business/:businessId', createSellByBusinessId); // Crear carrito SELL con el id del negocio
 app.post('/sell/post/addItem', addProductToSell);
 app.put('/sell/update/sell/:businessId', updateCarToFinish);
-const server = app.listen(7240, () => {
+const server = app.listen(PORT, () => {
     db.sync();
-    console.log(`Server running on port ${7240}`);
+    console.log(`Server running on port ${PORT}`);
 });
 
 
