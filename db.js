@@ -26,7 +26,7 @@ const modelPayService = require('./model/ServicePay');
 // SELLS 
 const modelSell = require('./model/sell');
 const modelProductSell = require('./model/sellProducts');
-require('dotenv').config(); `postgres:postgres:123@localhost:5432/jds`
+
 
 const sequelize = new Sequelize(`postgresql://postgres:baEA8SXlNLXhUuD8t6MC@containers-us-west-38.railway.app:7399/railway`, {
     logging: false,
