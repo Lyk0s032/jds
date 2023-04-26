@@ -148,9 +148,9 @@ app.get('/sell/business/:businessId/:date', getSellsByMonth);
 app.post('/sell/post/business/:businessId', createSellByBusinessId); // Crear carrito SELL con el id del negocio
 app.post('/sell/post/addItem', addProductToSell);
 app.put('/sell/update/sell/:businessId', updateCarToFinish);
-const server = app.listen(3000, () => {
+const server = app.listen(7240, () => {
     db.sync();
-    console.log(`Server running on port ${3000}`);
+    console.log(`Server running on port ${7240}`);
 });
 
 
